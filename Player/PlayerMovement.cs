@@ -23,6 +23,8 @@ public class PlayerMovement : KinematicBody
     [Export]
     private float frictionDeadZone;
     [Export]
+    private float movementDeadZone;
+    [Export]
     private Vector3 playerVelocity;
     [Export]
     private Vector3 playerDirection;
@@ -48,6 +50,7 @@ public class PlayerMovement : KinematicBody
         friction = 25.0f;
 
         frictionDeadZone = 0.3f;
+        movementDeadZone = 0.1f;
 
         hasInputMovement = false;
 
@@ -98,7 +101,7 @@ public class PlayerMovement : KinematicBody
         
         ProcessJump(delta);
 
-        MoveAndSlide(playerVelocity, upDirection : new Vector3(0, 1, 0)); // makes the ground a floor
+        MoveAndSlide(VectorCleanup(playerVelocity, movementDeadZone), upDirection : new Vector3(0, 1, 0)); // makes the ground a floor
         
     }
 
@@ -171,5 +174,13 @@ public class PlayerMovement : KinematicBody
     {
         // removes vertical component
         return new Vector3(vector.x, 0, vector.z);
+    }
+
+    private Vector3 VectorCleanup(Vector3 vector, float deadZone)
+    {
+        float xCoord = Mathf.Abs(vector.x) < deadZone ? 0 : vector.x;
+        float yCoord = Mathf.Abs(vector.y) < deadZone ? 0 : vector.y;
+        float zCoord = Mathf.Abs(vector.z) < deadZone ? 0 : vector.z;
+        return new Vector3(xCoord, yCoord, zCoord);
     }
 }
